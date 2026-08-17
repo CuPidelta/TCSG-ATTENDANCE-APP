@@ -7,9 +7,6 @@ import base64
 from pathlib import Path
 import textwrap
 
-# ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
 st.set_page_config(
     page_title="TCSG Scholar Attendance",
     page_icon="assets/tcsg_logo.jpg",
@@ -17,9 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---------------------------------------------------------
-# LOGO (base64-embedded so it renders reliably in HTML blocks)
-# ---------------------------------------------------------
+
 LOGO_PATH = Path(__file__).parent / "assets" / "tcsg_logo.jpg"
 
 @st.cache_data
@@ -31,9 +26,6 @@ def get_logo_b64():
 logo_b64 = get_logo_b64()
 logo_src = f"data:image/jpeg;base64,{logo_b64}" if logo_b64 else ""
 
-# ---------------------------------------------------------
-# THEME COLORS
-# ---------------------------------------------------------
 NAVY = "#1e3a72"
 NAVY_DARK = "#142a56"
 GOLD = "#f5a623"
@@ -141,9 +133,7 @@ def empty_state(icon_name, title, subtitle=""):
         </div>
     """).strip(), unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# DATABASE INITIALIZATION (SQLite with Soft Delete)
-# ---------------------------------------------------------
+
 DB_FILE = "scholars_attendance.db"
 INITIAL_REQUIRED_HOURS = 32.0
 
@@ -192,9 +182,6 @@ def init_db():
 
 init_db()
 
-# ---------------------------------------------------------
-# HELPER FUNCTIONS
-# ---------------------------------------------------------
 def load_scholars():
     conn = get_db_connection()
     df = pd.read_sql_query(
@@ -213,9 +200,6 @@ def load_logs():
     conn.close()
     return df
 
-# ---------------------------------------------------------
-# TOP BANNER
-# ---------------------------------------------------------
 st.markdown(textwrap.dedent(f"""
     <div class="tcsg-banner">
         <img src="{logo_src}" alt="TCSG Logo" />
@@ -226,9 +210,7 @@ st.markdown(textwrap.dedent(f"""
     </div>
 """).strip(), unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# SIDEBAR MANAGEMENT
-# ---------------------------------------------------------
+
 with st.sidebar:
     if logo_src:
         st.markdown(textwrap.dedent(f"""
@@ -339,18 +321,12 @@ with st.sidebar:
         else:
             empty_state("inbox", "No scholars yet", "Add your first scholar above.")
 
-# ---------------------------------------------------------
-# MAIN INTERFACE TABS
-# ---------------------------------------------------------
 tab_entry, tab_dashboard, tab_logs = st.tabs([
     "Batch Hours Entry",
     "Scholar Dashboard",
     "Attendance Logs"
 ])
 
-# ---------------------------------------------------------
-# TAB 1: BATCH HOURS ENTRY
-# ---------------------------------------------------------
 with tab_entry:
     st.markdown(f'<div class="section-label">{icon("clock-history", "1.1rem", NAVY)} Log Community Service Hours</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-sub">Paste a batch of scholar names and apply hours to all of them at once.</div>', unsafe_allow_html=True)
@@ -428,9 +404,7 @@ with tab_entry:
         else:
             st.error("Please enter at least one scholar name.")
 
-# ---------------------------------------------------------
-# TAB 2: SCHOLAR DASHBOARD
-# ---------------------------------------------------------
+
 with tab_dashboard:
     df_scholars = load_scholars()
 
@@ -556,9 +530,6 @@ with tab_dashboard:
     else:
         empty_state("people", "No scholar records found", "Add scholars using the Administration panel in the sidebar.")
 
-# ---------------------------------------------------------
-# TAB 3: ATTENDANCE LOGS HISTORY
-# ---------------------------------------------------------
 with tab_logs:
     st.markdown(f'<div class="section-label">{icon("journal-text", "1.1rem", NAVY)} Transaction History</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-sub">Full chronological record of every hours-logging transaction.</div>', unsafe_allow_html=True)
